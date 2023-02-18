@@ -21,6 +21,8 @@ lint:
 update-deps:
 	./gradlew useLatestVersions
 
+stage:
+	./gradlew stage
 
 build-run: build run
 

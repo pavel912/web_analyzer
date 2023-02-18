@@ -21,6 +21,8 @@ lint:
 update-deps:
 	make -C app update-deps
 
+stage:
+	make -C app stage
 
 build-run: build run
 
