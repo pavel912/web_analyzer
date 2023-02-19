@@ -1,6 +1,6 @@
 # Web pages analyzer
 
-### [Deploy on Railway](java-project-72-production-2c2b.up.railway.app)
+### [Deploy on Railway](https://java-project-72-production-2c2b.up.railway.app/)
 
 ### Hexlet tests and linter status:
 [![Actions Status](https://github.com/pavel912/java-project-72/workflows/hexlet-check/badge.svg)](https://github.com/pavel912/java-project-72/actions)
