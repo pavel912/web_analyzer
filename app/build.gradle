@@ -4,6 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'application'
+    id 'io.ebean' version '13.13.0'
 }
 
 group 'hexlet.code'
@@ -22,6 +23,19 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation group: 'io.javalin', name: 'javalin', version: '5.3.2'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.6'
+
+    implementation group: 'io.ebean', name: 'ebean', version: '13.13.0'
+    implementation group: 'io.ebean', name: 'ebean-ddl-generator', version: '13.13.0'
+    implementation group: 'io.ebean', name: 'ebean-migration', version: '13.7.0'
+    annotationProcessor group: 'io.ebean', name: 'querybean-generator', version: '13.13.0'
+    implementation group: 'io.ebean', name: 'ebean-querybean', version: '13.13.0'
+    implementation group: 'io.ebean', name: 'ebean-annotation', version: '8.3'
+
+    implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.5'
+    implementation 'javax.activation:activation:1.1.1'
+
+    implementation group: 'com.h2database', name: 'h2', version: '2.1.214'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.5.4'
 }
 
 compileJava {
@@ -43,3 +57,12 @@ jacocoTestReport {
 
 task stage(dependsOn: ['clean', 'installDist'])
 installDist.mustRunAfter clean
+
+task generateMigrations(type: JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'hexlet.code.MigrationGenerator'
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = "UTF-8"
+}
