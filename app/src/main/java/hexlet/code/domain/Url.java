@@ -3,23 +3,22 @@ package hexlet.code.domain;
 import java.time.Instant;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+
 import io.ebean.annotation.WhenCreated;
 import io.ebean.Model;
 
 @Entity
 public final class Url extends Model {
     @Id
-    private final long id;
+    private long id;
 
     private String name;
 
     @WhenCreated
-    private final Instant createdAt;
+    private Instant createdAt;
 
-    public Url(long id, String name, Instant createdAt) {
-        this.id = id;
+    public Url(String name) {
         this.name = name;
-        this.createdAt = createdAt;
     }
 
     public long getId() {

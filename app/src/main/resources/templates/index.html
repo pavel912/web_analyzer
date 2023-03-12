@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorate="~{layouts/application.html}">
+      layout:decorate="~{layouts/application.html}" lang="ru">
 
 <section layout:fragment="content">
     <div class="card">
-        <div class="card-body p-5 bg-light">
-            <p>Hello world!</p>
-        </div>
+        <form action="/urls" method="post" class="form">
+            <input name="url" type="url" id="url" required value>
+            <input type="submit" value="Add URL">
+        </form>
     </div>
 </section>
 

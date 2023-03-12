@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layouts/application.html}">
+
+<section layout:fragment="content">
+    <div class="container-lg mt-5">
+        <h1 th:text="${url.getName()}"></h1>
+
+        <table class="table table-bordered table-hover mt-3">
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td th:text="${url.getId()}"></td>
+            </tr>
+            <tr>
+                <td>Name</td>
+                <td th:text="${url.getName()}"></td>
+            </tr>
+            <tr>
+                <td>Created at</td>
+                <td th:text="${url.getCreatedAt()}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="container-lg mt-5">
+        <h1>Checks</h1>
+
+        <table class="table table-bordered table-hover mt-3">
+            <thead>
+            <tr>
+                <th class="col-1">ID</th>
+                <th class="col-1">Answer code</th>
+                <th>Title</th>
+                <th>h1</th>
+                <th>description</th>
+                <th class="col-1">Last checked at</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</section>
+
+</html>

@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'application'
-    id 'io.ebean' version '13.13.0'
+    id "io.ebean" version "13.14.1"
 }
 
 group 'hexlet.code'
@@ -21,6 +21,7 @@ application {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+    testImplementation 'io.ebean:ebean-test:13.13.0'
     implementation group: 'io.javalin', name: 'javalin', version: '4.3.0'
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.6'
 
