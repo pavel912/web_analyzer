@@ -44,7 +44,7 @@ public class AppTest {
         server = new MockWebServer();
 
         MockResponse response = new MockResponse()
-                .setBody("<head><title>MockWebServer</title></head><body><h1>Try your HTTP requests</h1></body>")
+                .setBody("<head><title>MockWebServer</title><meta name=\"description\" content=\"This is a MockWebServer\"></head><body><h1>Try your HTTP requests</h1></body>")
                 .setResponseCode(200);
 
         server.enqueue(response);
@@ -139,5 +139,9 @@ public class AppTest {
         assertNotNull(urlCheck);
 
         assertEquals(200, urlCheck.getStatusCode());
+
+        assertEquals("MockWebServer", urlCheck.getTitle());
+        assertEquals("This is a MockWebServer", urlCheck.getDescription());
+        assertEquals("Try your HTTP requests", urlCheck.getH1());
     }
 }
