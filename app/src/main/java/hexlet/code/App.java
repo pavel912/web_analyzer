@@ -1,5 +1,6 @@
 package hexlet.code;
 
+import hexlet.code.controllers.ChecksController;
 import hexlet.code.controllers.URLController;
 import io.javalin.Javalin;
 import io.javalin.plugin.rendering.template.JavalinThymeleaf;
@@ -22,6 +23,7 @@ public class App {
         app.post("/urls", URLController.addUrl);
         app.get("/urls", URLController.getURLList);
         app.get("/urls/{id}", URLController.getURL);
+        app.post("/urls/{id}/checks", ChecksController.addUrlCheck);
     }
 
     private static TemplateEngine getTemplateEngine() {

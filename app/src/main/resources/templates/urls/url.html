@@ -27,6 +27,10 @@
     <div class="container-lg mt-5">
         <h1>Checks</h1>
 
+        <form action="#" th:action="@{/urls/{id}/checks(id=${url.getId()})}" method="post" class="form">
+            <button type="submit" class="btn btn-primary">Check</button>
+        </form>
+
         <table class="table table-bordered table-hover mt-3">
             <thead>
             <tr>
@@ -35,10 +39,18 @@
                 <th>Title</th>
                 <th>h1</th>
                 <th>description</th>
-                <th class="col-1">Last checked at</th>
+                <th class="col-1">Checked at</th>
             </tr>
             </thead>
             <tbody>
+            <tr th:each="check : ${url.getUrlChecks()}" th:object="${check}">
+                <td th:text="*{getId()}"></td>
+                <td th:text="*{getStatusCode()}"></td>
+                <td th:text="*{getTitle()}"></td>
+                <td th:text="*{getH1()}"></td>
+                <td th:text="*{getDescription()}"></td>
+                <td th:text="*{getCreatedAt()}"></td>
+            </tr>
             </tbody>
         </table>
     </div>
