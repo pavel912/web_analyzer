@@ -2,14 +2,18 @@ package hexlet.code;
 
 import hexlet.code.controllers.ChecksController;
 import hexlet.code.controllers.URLController;
+import hexlet.code.controllers.RootController;
+
 import io.javalin.Javalin;
 import io.javalin.plugin.rendering.template.JavalinThymeleaf;
+import static io.javalin.apibuilder.ApiBuilder.path;
+import static io.javalin.apibuilder.ApiBuilder.get;
+import static io.javalin.apibuilder.ApiBuilder.post;
 
-import hexlet.code.controllers.RootController;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
-import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
+import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
 
 public class App {
@@ -20,10 +24,15 @@ public class App {
 
     private static void addRoutes(Javalin app) {
         app.get("/", RootController.welcome);
-        app.post("/urls", URLController.addUrl);
-        app.get("/urls", URLController.getURLList);
-        app.get("/urls/{id}", URLController.getURL);
-        app.post("/urls/{id}/checks", ChecksController.addUrlCheck);
+
+        app.routes(() -> path("urls", () -> {
+            get(URLController.getURLList);
+            post(URLController.addUrl);
+            path("{id}", () -> {
+                get(URLController.getURL);
+                post("checks", ChecksController.addUrlCheck);
+            });
+        }));
     }
 
     private static TemplateEngine getTemplateEngine() {
