@@ -1,83 +1,143 @@
 package hexlet.code;
-import hexlet.code.domain.Url;
-import hexlet.code.domain.query.QUrl;
-import io.javalin.Javalin;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
+import hexlet.code.domain.Url;
+import hexlet.code.domain.UrlCheck;
+import hexlet.code.domain.query.QUrl;
+import hexlet.code.domain.query.QUrlCheck;
+import hexlet.code.utils.BasicUtils;
+
+import io.javalin.Javalin;
+
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import kong.unirest.JsonNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.net.MalformedURLException;
+
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AppTest {
-    static Javalin app;
-    static String baseUrl;
+    private static Javalin app;
+    private static String baseUrl;
+    private static MockWebServer server;
+    private static String serverUrl;
 
     @BeforeAll
-    static void addUrl() throws IOException {
+    static void start() throws IOException {
         app = App.getApp();
         app.start(0);
         int port = app.port();
         baseUrl = "http://localhost:" + port;
 
-        HttpClient httpClient = HttpClients.createDefault();
-        HttpPost httpPost = new HttpPost(baseUrl + "/urls");
+        server = new MockWebServer();
 
-        List<NameValuePair> params = new ArrayList<>(1);
-        params.add(new BasicNameValuePair("url", "https://www.google.com/doodles"));
-        UrlEncodedFormEntity form = new UrlEncodedFormEntity(params, "UTF-8");
-        httpPost.setEntity(form);
+        MockResponse response = new MockResponse()
+                .setBody("<head><title>MockWebServer</title></head><body><h1>Try your HTTP requests</h1></body>")
+                .setResponseCode(200);
 
-        httpClient.execute(httpPost);
+        server.enqueue(response);
+
+        server.start();
+
+        serverUrl = server.url("/").toString();
+    }
+
+    @AfterAll
+    static void afterAll() throws IOException {
+        server.shutdown();
+        app.stop();
+    }
+
+    @BeforeEach
+    void addTestDate(TestInfo info) throws IOException {
+        new QUrl().delete();
+
+        if (info.getDisplayName().equals("addCorrectUrl")) {
+            return;
+        }
+
+        Url url = new Url(BasicUtils.trimUrl(serverUrl));
+        url.save();
+    }
+
+    @Test
+    void addCorrectUrl() throws MalformedURLException {
+        HttpResponse<JsonNode> response = Unirest.post(baseUrl + "/urls").field("url", serverUrl).asJson();
+
+        assertEquals(200, response.getStatus());
+
+        assertTrue(new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).exists());
+    }
+
+    @Test
+    void addSameUrl() throws MalformedURLException {
+        Unirest.post(baseUrl + "/urls").field("url", serverUrl).asJson();
+
+        assertEquals(1, new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findCount());
+    }
+
+    @Test
+    void addIncorrectUrl() throws MalformedURLException {
+        Unirest.post(baseUrl + "/urls").field("url", "fsdfsdf").asJson();
+
+        assertFalse(new QUrl().name.eq("fsdfsdf").exists());
     }
 
     @Test
     void testShowUrl() throws IOException {
-        HttpClient httpClient = HttpClients.createDefault();
-        Url url = new QUrl().name.eq("https://www.google.com").findOne();
+        Url url = new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findOne();
 
         assertNotNull(url);
 
-        HttpGet httpGet = new HttpGet(baseUrl + String.format("/urls/%d", url.getId()));
+        HttpResponse<JsonNode> response = Unirest
+                .get(baseUrl + "/urls/{id}")
+                .routeParam("id", String.valueOf(url.getId()))
+                .asJson();
 
-        HttpResponse getResponse = httpClient.execute(httpGet);
-
-        assertEquals(200, getResponse.getStatusLine().getStatusCode());
+        assertEquals(200, response.getStatus());
     }
 
     @Test
     void testShowListUrls() throws IOException {
-        HttpClient httpClient = HttpClients.createDefault();
-        Url url = new QUrl().name.eq("https://www.google.com").findOne();
+        Url url = new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findOne();
 
         assertNotNull(url);
 
-        HttpGet httpGet = new HttpGet(baseUrl + "/urls");
+        HttpResponse<String> response = Unirest.get(baseUrl + "/urls").asString();
 
-        HttpResponse getResponse = httpClient.execute(httpGet);
-        String responseBody = new String(getResponse
-                .getEntity()
-                .getContent()
-                .readAllBytes());
-        assertTrue(responseBody.contains("https://www.google.com"));
+        assertEquals(200, response.getStatus());
+        assertTrue(response.getBody().contains(BasicUtils.trimUrl(serverUrl)));
     }
 
-    @AfterAll
-    static void afterAll() {
-        app.stop();
+    @Test
+    void testUrlCheck() throws MalformedURLException {
+        Url url = new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findOne();
+
+        assertNotNull(url);
+
+        HttpResponse<JsonNode> response = Unirest
+                .post(baseUrl + "/urls/{id}/checks")
+                .routeParam("id", String.valueOf(url.getId()))
+                .asJson();
+
+        assertEquals(302, response.getStatus());
+
+        UrlCheck urlCheck = new QUrlCheck().url.eq(url).findOne();
+
+        assertNotNull(urlCheck);
+
+        assertEquals(200, urlCheck.getStatusCode());
     }
 }
