@@ -47,6 +47,7 @@ dependencies {
 
     implementation 'com.konghq:unirest-java:3.11.09'
     implementation 'org.jsoup:jsoup:1.15.4'
+    implementation 'commons-io:commons-io:2.11.0'
 }
 
 compileJava {

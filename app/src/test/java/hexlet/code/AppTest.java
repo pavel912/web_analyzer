@@ -14,8 +14,12 @@ import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
 import kong.unirest.JsonNode;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
+import org.apache.commons.io.FileUtils;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -43,8 +47,12 @@ public class AppTest {
 
         server = new MockWebServer();
 
+        String testBodyPath = Paths.get("").toAbsolutePath() + "/src/test/resources/test_body.html";
+
+        String testBody = FileUtils.readFileToString(new File(testBodyPath), StandardCharsets.UTF_8);
+
         MockResponse response = new MockResponse()
-                .setBody("<head><title>MockWebServer</title><meta name=\"description\" content=\"This is a MockWebServer\"></head><body><h1>Try your HTTP requests</h1></body>")
+                .setBody(testBody)
                 .setResponseCode(200);
 
         server.enqueue(response);
