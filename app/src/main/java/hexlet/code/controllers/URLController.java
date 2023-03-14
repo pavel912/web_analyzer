@@ -2,12 +2,12 @@ package hexlet.code.controllers;
 
 import hexlet.code.domain.Url;
 import hexlet.code.domain.query.QUrl;
+import hexlet.code.utils.BasicUtils;
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -15,23 +15,30 @@ public class URLController {
     public static Handler addUrl = ctx -> {
         String value = ctx.formParam("url");
         if (value == null) {
-            ctx.sessionAttribute("flash", "Отсутствует ссылка");
+            ctx.sessionAttribute("flash", "No URL provided");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.render("index.html");
             return;
         }
-        URL url;
+        String truncatedUrlName;
 
         try {
-            url = new URL(value);
+            truncatedUrlName = BasicUtils.trimUrl(value);
         } catch (MalformedURLException e) {
-            ctx.sessionAttribute("flash", "Неверный формат ссылки");
+            ctx.sessionAttribute("flash", "Wrong URL format");
             ctx.sessionAttribute("flash-type", "danger");
             ctx.render("index.html");
             return;
         }
 
-        String truncatedUrlName = url.getProtocol().concat("://").concat(url.getAuthority());
+        boolean existsSameUrl = new QUrl().name.eq(truncatedUrlName).exists();
+
+        if (existsSameUrl) {
+            ctx.sessionAttribute("flash", "This URL already exists");
+            ctx.sessionAttribute("flash-type", "danger");
+            ctx.render("index.html");
+            return;
+        }
 
         Url myUrl = new Url(truncatedUrlName);
         myUrl.save();
