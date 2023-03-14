@@ -23,13 +23,13 @@ public class ChecksController {
 
         HttpResponse<String> response = Unirest.get(url.getName()).asString();
 
-        String body = response.getBody();
+        Document body = Jsoup.parse(response.getBody());
 
         UrlCheck urlCheck = new UrlCheck(
                 response.getStatus(),
                 getTagValue(body, "title"),
                 getTagValue(body, "h1"),
-                getTagValue(body, "description"),
+                getTagValue(body, "meta"),
                 url);
 
         url.addUrlCheck(urlCheck);
@@ -41,8 +41,14 @@ public class ChecksController {
         ctx.sessionAttribute("flash-type", "success");
     };
 
-    public static String getTagValue(String body, String tagName) {
-        Document doc = Jsoup.parse(body);
+    public static String getTagValue(Document doc, String tagName) {
+        if (tagName.equals("meta")) {
+            Element tag = doc.selectFirst("meta[name=description]");
+            if (tag != null && tag.hasAttr("content")) {
+                return tag.attr("content");
+            }
+        }
+
         Element tag = doc.selectFirst(tagName);
 
         if (tag != null) {
