@@ -2,7 +2,6 @@ package hexlet.code.domain;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -54,19 +53,16 @@ public final class Url extends Model {
     }
 
     public UrlCheck getLastCheck() {
-        return getUrlChecks().stream().max(new Comparator<UrlCheck>() {
-            @Override
-            public int compare(UrlCheck o1, UrlCheck o2) {
-                if (o1.getCreatedAt().isAfter(o2.getCreatedAt())) {
-                    return 1;
-                }
-
-                if (o1.getCreatedAt().isBefore(o2.getCreatedAt())) {
-                    return -1;
-                }
-
-                return 0;
+        return getUrlChecks().stream().max((o1, o2) -> {
+            if (o1.getCreatedAt().isAfter(o2.getCreatedAt())) {
+                return 1;
             }
+
+            if (o1.getCreatedAt().isBefore(o2.getCreatedAt())) {
+                return -1;
+            }
+
+            return 0;
         }).orElse(null);
     }
 }
