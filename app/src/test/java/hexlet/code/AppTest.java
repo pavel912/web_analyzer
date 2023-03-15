@@ -12,7 +12,6 @@ import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import kong.unirest.HttpResponse;
 import kong.unirest.Unirest;
-import kong.unirest.JsonNode;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,6 +20,7 @@ import java.net.MalformedURLException;
 import java.nio.charset.StandardCharsets;
 import org.apache.commons.io.FileUtils;
 
+import org.jsoup.Jsoup;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -47,7 +47,11 @@ public class AppTest {
 
         server = new MockWebServer();
 
-        String testBodyPath = Paths.get("").toAbsolutePath() + "/src/test/resources/test_body.html";
+        String testBodyPath = Paths
+                .get("src", "test", "resources", "fixtures", "test_body.html")
+                .toAbsolutePath()
+                .normalize()
+                .toString();
 
         String testBody = FileUtils.readFileToString(new File(testBodyPath), StandardCharsets.UTF_8);
 
@@ -69,10 +73,10 @@ public class AppTest {
     }
 
     @BeforeEach
-    void addTestDate(TestInfo info) throws IOException {
+    void addTestData(TestInfo info) throws IOException {
         new QUrl().delete();
 
-        if (info.getDisplayName().equals("addCorrectUrl")) {
+        if (info.getDisplayName().equals("addCorrectUrl()")) {
             return;
         }
 
@@ -82,23 +86,42 @@ public class AppTest {
 
     @Test
     void addCorrectUrl() throws MalformedURLException {
-        HttpResponse<JsonNode> response = Unirest.post(baseUrl + "/urls").field("url", serverUrl).asJson();
+        HttpResponse<String> response = Unirest.post(baseUrl + "/urls").field("url", serverUrl).asString();
 
-        assertEquals(200, response.getStatus());
+        assertEquals(302, response.getStatus());
 
         assertTrue(new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).exists());
     }
 
     @Test
     void addSameUrl() throws MalformedURLException {
-        Unirest.post(baseUrl + "/urls").field("url", serverUrl).asJson();
+        HttpResponse<String> response = Unirest.post(baseUrl + "/urls").field("url", serverUrl).asString();
+
+        assertEquals("This URL already exists",
+                BasicUtils.getTagValue(Jsoup.parse(response.getBody()), "p"));
 
         assertEquals(1, new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findCount());
     }
 
     @Test
-    void addIncorrectUrl() throws MalformedURLException {
-        Unirest.post(baseUrl + "/urls").field("url", "fsdfsdf").asJson();
+    void addIncorrectUrl() {
+        HttpResponse<String> response = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", "fsdfsdf")
+                .asString();
+
+        assertEquals("Wrong URL format", BasicUtils.getTagValue(Jsoup.parse(response.getBody()), "p"));
+
+        assertFalse(new QUrl().name.eq("fsdfsdf").exists());
+    }
+
+    @Test
+    void addNullUrl() {
+        HttpResponse<String> response = Unirest
+                .post(baseUrl + "/urls")
+                .asString();
+
+        assertEquals("No URL provided", BasicUtils.getTagValue(Jsoup.parse(response.getBody()), "p"));
 
         assertFalse(new QUrl().name.eq("fsdfsdf").exists());
     }
@@ -109,10 +132,10 @@ public class AppTest {
 
         assertNotNull(url);
 
-        HttpResponse<JsonNode> response = Unirest
+        HttpResponse<String> response = Unirest
                 .get(baseUrl + "/urls/{id}")
                 .routeParam("id", String.valueOf(url.getId()))
-                .asJson();
+                .asString();
 
         assertEquals(200, response.getStatus());
     }
@@ -135,10 +158,10 @@ public class AppTest {
 
         assertNotNull(url);
 
-        HttpResponse<JsonNode> response = Unirest
+        HttpResponse<String> response = Unirest
                 .post(baseUrl + "/urls/{id}/checks")
                 .routeParam("id", String.valueOf(url.getId()))
-                .asJson();
+                .asString();
 
         assertEquals(302, response.getStatus());
 

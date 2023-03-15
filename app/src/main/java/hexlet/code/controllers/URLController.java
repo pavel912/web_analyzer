@@ -1,11 +1,17 @@
 package hexlet.code.controllers;
 
 import hexlet.code.domain.Url;
+import hexlet.code.domain.UrlCheck;
 import hexlet.code.domain.query.QUrl;
 import hexlet.code.utils.BasicUtils;
+
 import io.ebean.PagedList;
 import io.javalin.http.Handler;
 import io.javalin.http.NotFoundResponse;
+import kong.unirest.HttpResponse;
+import kong.unirest.Unirest;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 import java.net.MalformedURLException;
 import java.util.List;
@@ -86,5 +92,34 @@ public class URLController {
 
         ctx.attribute("url", url);
         ctx.render("urls/url.html");
+    };
+
+    public static Handler addUrlCheck = ctx -> {
+        int urlId = ctx.pathParamAsClass("id", Integer.class).getOrDefault(null);
+
+        Url url = new QUrl().id.eq(urlId).findOne();
+
+        if (url == null) {
+            throw new NotFoundResponse();
+        }
+
+        HttpResponse<String> response = Unirest.get(url.getName()).asString();
+
+        Document body = Jsoup.parse(response.getBody());
+
+        UrlCheck urlCheck = new UrlCheck(
+                response.getStatus(),
+                BasicUtils.getTagValue(body, "title"),
+                BasicUtils.getTagValue(body, "h1"),
+                BasicUtils.getTagValue(body, "meta"),
+                url);
+
+        url.addUrlCheck(urlCheck);
+        urlCheck.save();
+        url.update();
+
+        ctx.redirect(String.format("/urls/%d", urlId));
+        ctx.sessionAttribute("flash", "Site was checked successfully");
+        ctx.sessionAttribute("flash-type", "success");
     };
 }

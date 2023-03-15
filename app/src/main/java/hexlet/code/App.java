@@ -1,6 +1,5 @@
 package hexlet.code;
 
-import hexlet.code.controllers.ChecksController;
 import hexlet.code.controllers.URLController;
 import hexlet.code.controllers.RootController;
 
@@ -30,7 +29,7 @@ public class App {
             post(URLController.addUrl);
             path("{id}", () -> {
                 get(URLController.getURL);
-                post("checks", ChecksController.addUrlCheck);
+                post("checks", URLController.addUrlCheck);
             });
         }));
     }
