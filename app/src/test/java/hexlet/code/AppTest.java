@@ -75,6 +75,7 @@ public class AppTest {
     @BeforeEach
     void addTestData(TestInfo info) throws IOException {
         new QUrl().delete();
+        new QUrlCheck().delete();
 
         if (info.getDisplayName().equals("addCorrectUrl()")) {
             return;
@@ -82,6 +83,13 @@ public class AppTest {
 
         Url url = new Url(BasicUtils.trimUrl(serverUrl));
         url.save();
+    }
+
+    @Test
+    void testIndex() {
+        HttpResponse<String> response = Unirest.get(baseUrl + "/").asString();
+
+        assertEquals(200, response.getStatus());
     }
 
     @Test
@@ -174,5 +182,21 @@ public class AppTest {
         assertEquals("MockWebServer", urlCheck.getTitle());
         assertEquals("This is a MockWebServer", urlCheck.getDescription());
         assertEquals("Try your HTTP requests", urlCheck.getH1());
+    }
+
+    @Test
+    void testToRiseCodeCoverage() throws MalformedURLException {
+        Url url = new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findOne();
+
+        UrlCheck urlCheck = new UrlCheck(200, "", "", "", url);
+        urlCheck.save();
+
+        UrlCheck thisUrlCheck = new QUrlCheck().findOne();
+
+        assertEquals(thisUrlCheck.getId(), thisUrlCheck.getId());
+        assertEquals(thisUrlCheck.getCreatedAt(), thisUrlCheck.getCreatedAt());
+        assertEquals(url, thisUrlCheck.getUrl());
+
+        assertEquals(thisUrlCheck, url.getLastCheck());
     }
 }
