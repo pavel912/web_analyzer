@@ -14,8 +14,12 @@ import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class App {
+    private static final Logger LOGGER = LoggerFactory.getLogger(App.class);
     private static int getPort() {
         String port = System.getenv().getOrDefault("PORT", "5000");
         return Integer.parseInt(port);
@@ -47,10 +51,22 @@ public class App {
         return templateEngine;
     }
 
+    private static String getMode() {
+        String mode = System.getenv().getOrDefault("APP_ENV", "development");
+        LOGGER.info("Mode: {}", mode);
+        return mode;
+    }
+
+    private static boolean isProduction() {
+        return getMode().equals("production");
+    }
+
     public static Javalin getApp() {
 
         Javalin app = Javalin.create(config -> {
-            config.enableDevLogging();
+            if (!isProduction()) {
+                config.enableDevLogging();
+            }
             JavalinThymeleaf.configure(getTemplateEngine());
             config.enableWebjars();
         });
