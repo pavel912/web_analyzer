@@ -7,3 +7,5 @@ build
 .idea
 
 *.db
+
+app/src/test/resources/fixtures/index.html

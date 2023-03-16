@@ -50,7 +50,7 @@ public class URLController {
         myUrl.save();
 
         ctx.redirect("/urls");
-        ctx.sessionAttribute("flash", "Link was added successfully");
+        ctx.sessionAttribute("flash", "Страница успешно добавлена");
         ctx.sessionAttribute("flash-type", "success");
     };
 
@@ -119,7 +119,7 @@ public class URLController {
         url.update();
 
         ctx.redirect(String.format("/urls/%d", urlId));
-        ctx.sessionAttribute("flash", "Site was checked successfully");
+        ctx.sessionAttribute("flash", "Страница успешно проверена");
         ctx.sessionAttribute("flash-type", "success");
     };
 }
