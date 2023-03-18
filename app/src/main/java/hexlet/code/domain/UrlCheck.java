@@ -11,7 +11,7 @@ import io.ebean.Model;
 
 
 @Entity
-public class UrlCheck extends Model {
+public final class UrlCheck extends Model {
     @Id
     private long id;
 
