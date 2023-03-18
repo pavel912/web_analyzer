@@ -25,7 +25,7 @@
                     <p th:if="${#lists.size(url.getUrlChecks())}" th:text="${#temporals.format(url.getLastCheck().getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></p>
                 </td>
                 <td>
-                    <p th:if="${#lists.size(url.getUrlChecks())}" th:text="${#temporals.format(url.getLastCheck().getCreatedAt(), 'dd/MM/yyyy HH:mm')}"></p>
+                    <p th:if="${#lists.size(url.getUrlChecks())}" th:text="${url.getLastCheck().getStatusCode()}"></p>
                 </td>
             </tr>
             </tbody>
