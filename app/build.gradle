@@ -4,7 +4,8 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'application'
-    id "io.ebean" version "13.14.1"
+    id 'com.adarshr.test-logger' version '3.2.0'
+    id "io.ebean" version "13.11.0"
 }
 
 group 'hexlet.code'
@@ -21,17 +22,17 @@ application {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
-    testImplementation 'io.ebean:ebean-test:13.13.0'
+    testImplementation 'io.ebean:ebean-test:12.15.1'
     testImplementation 'com.squareup.okhttp3:mockwebserver:4.10.0'
     implementation group: 'io.javalin', name: 'javalin', version: '4.3.0'
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '2.0.6'
+    implementation group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.36'
 
-    implementation group: 'io.ebean', name: 'ebean', version: '13.13.0'
-    implementation group: 'io.ebean', name: 'ebean-ddl-generator', version: '13.13.0'
-    implementation group: 'io.ebean', name: 'ebean-migration', version: '13.7.0'
-    annotationProcessor group: 'io.ebean', name: 'querybean-generator', version: '13.13.0'
-    implementation group: 'io.ebean', name: 'ebean-querybean', version: '13.13.0'
-    implementation group: 'io.ebean', name: 'ebean-annotation', version: '8.3'
+    implementation group: 'io.ebean', name: 'ebean', version: '12.15.1'
+    implementation group: 'io.ebean', name: 'ebean-ddl-generator', version: '12.15.1'
+    implementation group: 'io.ebean', name: 'ebean-migration', version: '12.15.1'
+    annotationProcessor group: 'io.ebean', name: 'querybean-generator', version: '12.15.1'
+    implementation group: 'io.ebean', name: 'ebean-querybean', version: '12.15.1'
+    implementation group: 'io.ebean', name: 'ebean-annotation', version: '7.7'
 
     implementation 'org.glassfish.jaxb:jaxb-runtime:2.3.5'
     implementation 'javax.activation:activation:1.1.1'
