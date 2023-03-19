@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import java.net.MalformedURLException;
+import kong.unirest.UnirestException;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -103,7 +104,16 @@ public class URLController {
             throw new NotFoundResponse();
         }
 
-        HttpResponse<String> response = Unirest.get(url.getName()).asString();
+        HttpResponse<String> response;
+
+        try {
+            response = Unirest.get(url.getName()).asString();
+        } catch (UnirestException e) {
+            ctx.redirect(String.format("/urls/%d", urlId), 404);
+            ctx.sessionAttribute("flash", "Такой страницы не существует");
+            ctx.sessionAttribute("flash-type", "danger");
+            return;
+        }
 
         Document body = Jsoup.parse(response.getBody());
 

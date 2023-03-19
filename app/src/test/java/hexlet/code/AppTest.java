@@ -185,6 +185,28 @@ public final class AppTest {
     }
 
     @Test
+    void checkNonExistentUrl() throws MalformedURLException {
+        String urlName = "https://gaaagle.com/";
+        HttpResponse<String> responseCreate = Unirest
+                .post(baseUrl + "/urls")
+                .field("url", urlName)
+                .asString();
+
+        assertEquals(302, responseCreate.getStatus());
+
+        Url url = new QUrl().name.eq(BasicUtils.trimUrl(urlName)).findOne();
+
+        assertNotNull(url);
+
+        HttpResponse<String> responseCheck = Unirest
+                .post(baseUrl + "/urls/{id}/checks")
+                .routeParam("id", String.valueOf(url.getId()))
+                .asString();
+
+        assertEquals(404, responseCheck.getStatus());
+    }
+
+    @Test
     void testToRiseCodeCoverage() throws MalformedURLException {
         Url url = new QUrl().name.eq(BasicUtils.trimUrl(serverUrl)).findOne();
 
