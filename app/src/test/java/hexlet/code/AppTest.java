@@ -203,7 +203,7 @@ public final class AppTest {
                 .routeParam("id", String.valueOf(url.getId()))
                 .asString();
 
-        assertEquals(404, responseCheck.getStatus());
+        assertEquals(302, responseCheck.getStatus());
     }
 
     @Test

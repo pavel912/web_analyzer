@@ -109,7 +109,7 @@ public class URLController {
         try {
             response = Unirest.get(url.getName()).asString();
         } catch (UnirestException e) {
-            ctx.redirect(String.format("/urls/%d", urlId), 404);
+            ctx.redirect(String.format("/urls/%d", urlId));
             ctx.sessionAttribute("flash", "Такой страницы не существует");
             ctx.sessionAttribute("flash-type", "danger");
             return;
